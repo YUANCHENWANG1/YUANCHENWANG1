@@ -1,0 +1,325 @@
+# app_mobile.py
+# 手机专用版 - 针对竖屏小屏优化，加大触控区域，精简布局
+# 增加了通用 HTTP JSON 适配器：支持配置 API URL、Authorization token、缓存 TTL 与回退到 mock 数据
+
+import导入 streamlit as作为 st
+import导入 pandas as作为 pd导入pandas作为pdimport 导入 pandas 作为 pd 导入 pandas 作为 pd
+import导入 numpy as作为 np导入numpy作为npimport 导入 numpy as作为 作为 np 导入 numpy 作为 npimport 导入 numpy as作为 作为 np 导入 numpy 作为 np 导入 numpy 作为 np
+from来自 datetime import导入 datetime, timezonefrom 来自 datetime import导入 导入 datetime, timezone
+import导入 time导入timeimport 导入 time 导入 timeimport 导入 time 导入 timeimport 导入 time 导入 time
+
+# Optional dependency for HTTP requests# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的......# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项#......# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可......# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项......TTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖......TTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项......# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项#......TTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项......# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项......TTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项......TTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖......TTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求......TTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项......# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的......TTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项......# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选......HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项#......HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求依赖项# 可选的 HTTP 请求......
+try:
+    import导入 requests导入requests
+except Exception:除非异常：除了异常：除非异常：
+    requests = Nonerequests =无
+
+# ---------- 页面配置 (必须是第一个 Streamlit API 调用) ----------
+st.set_page_config(街.set_page_config(街.set_page_config(page_title="期货智析·手机版"页面标题="期货智析·手机版", layout="centered"“居中”), 布局="centered")页面标题="期货智析·手机版"页面标题="期货智析·手机版", layout="centered"“居中”), 布局="centered")页面标题="期货智析·手机版"页面标题="期货智析·手机版", layout="centered"“居中”), 布局="centered")页面标题="期货智析·手机版"页面标题="期货智析·手机版", layout="centered"“居中”), 布局="centered")页面标题="期货智析·手机版"页面标题="期货智析·手机版", layout="centered"“居中”), 布局="centered")页面标题="期货智析·手机版"页面标题="期货智析·手机版", layout="centered"“居中”), 布局="centered")页面标题="期货智析·手机版"页面标题="期货智析·手机版", layout="centered"“居中”), 布局="centered")页面标题="期货智析·手机版"页面标题="期货智析·手机版", layout="centered"“居中”), 布局="centered")
+
+# ---------- 强制移动端适配的CSS ----------
+st.markdown("""
+<style>
+    /* 整体宽度自适应，最大宽度600px，居中 */
+    .reportview-container .main .block-container {
+        max-width: 600px;
+        padding-top: 1rem;
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+        margin: 0 auto;外边距：0 自动；
+    }
+
+    /* metric 字体与标签（尝试性选择器） */
+    [data-testid="stMetricValue"], .stMetricValue, .metric-value {
+        font-size: 1.6rem !important;
+        line-height: 1.2 !important;
+    }
+    [data-testid="stMetricLabel"], .stMetricLabel, .metric-label {
+        font-size: 1rem !important;
+    }
+
+    /* 下拉框、按钮加大触控区域（通用选择器） */
+    select, button, .stSelectbox, .stButton button {
+        font-size: 1.1rem !important;
+        padding: 0.45rem !important;
+    }
+
+    /* 表格字体自适应 */
+    .dataframe, table {
+        font-size: 0.95rem !important;
+    }
+
+    /* 标题优化 */
+    h1 { font-size: 2rem !important; }
+    h3 { font-size: 1.3rem !important; }
+
+    /* 滚动条美化 */
+    ::-webkit-scrollbar { width: 3px; }
+
+    /* 分割线更细 */
+    hr { margin: 0.5rem 0; }
+</style>
+""", unsafe_allow_html=True)
+
+# ---------- 标题与时间 ----------
+st.title("📊 期货智析")
+st.caption(f"📱 手机专属 | {datetime.now().strftime('%m-%d %H:%M')}")
+
+# ---------- Sidebar: API 配置 ----------
+st.sidebar.header("数据源配置（可选）")
+api_url = st.sidebar.text_input("API URL（留空使用内置 mock 数据）", value="")
+auth_token = st.sidebar.text_input("Authorization Token（可选）", value="", type="password")
+cache_ttl = st.sidebar.number_input("缓存 TTL（秒）", min_value=0, value=300, step=60)
+allow_fallback = st.sidebar.checkbox("API 失败时回退到内置 mock 数据", value=True)
+refresh = st.sidebar.button("刷新数据（强制）")
+
+# ---------- 内置 mock 数据 ----------
+def builtin_mock():
+    return {
+        "RB": {"name": "螺纹钢", "spot": 3750, "near": 3720, "far": 3650,
+               "inventory": 580, "profit": 185, "warehouse": 85600, "reg": 1200, "cancel": 450},
+        "I":  {"name": "铁矿石", "spot": 860, "near": 850, "far": 810,
+               "inventory": 13500, "profit": 92, "warehouse": 2300, "reg": 0, "cancel": 200},
+        "SA": {"name": "纯碱", "spot": 2250, "near": 2200, "far": 2100,
+               "inventory": 320, "profit": 260, "warehouse": 1500, "reg": 500, "cancel": 100},
+        "CU": {"name": "铜", "spot": 69000, "near": 68800, "far": 68500,
+               "inventory": 280, "profit": 800, "warehouse": 42000, "reg": 800, "cancel": 300},
+        "AU": {"name": "黄金", "spot": 478, "near": 476, "far": 475,
+               "inventory": 10, "profit": 15, "warehouse": 3500, "reg": 50, "cancel": 80},
+    }
+
+# ---------- 辅助：尝试从不同 JSON 结构解析并映射字段 ----------
+def normalize_api_json(json_obj):
+    """
+    接受 API 返回的 JSON（可能是 dict-of-objects 或 list-of-objects），
+    返回一个 dict keyed by code，value 为包含期望字段的 dict。
+    支持多种常见字段名（symbol/code/name/spot/near/far/inventory/profit/warehouse/reg/cancel）。
+    """
+    # flatten into list of candidate items
+    items = []
+    if isinstance(json_obj, dict):
+        # If values look like objects, treat as {code: obj}
+        if all(not isinstance(v, (str, int, float, list)) for v in json_obj.values()):
+            for k, v in json_obj.items():
+                obj = dict(v) if isinstance(v, dict) else {"value": v}
+                # add code if not present
+                if "code" not in obj and "symbol" not in obj and "id" not in obj:
+                    obj["code"] = k
+                items.append(obj)
+        else:
+            # maybe single object with fields
+            items = [json_obj]
+    elif isinstance(json_obj, list):
+        items = json_obj
+    else:
+        return None  # unknown shape
+
+    def extract_field(obj, candidates):
+        for c in candidates:
+            if c in obj and obj[c] is not None:
+                return obj[c]
+        return None
+
+    result = {}
+    for it in items:
+        if not isinstance(it, dict):
+            continue
+        code = extract_field(it, ["code", "symbol", "ticker", "id"])
+        # if code still None and there's a name-like and price-like, try to create a key
+        if code is None:
+            # fallback to name
+            code = extract_field(it, ["name", "shortName"]) or f"X_{len(result)+1}"
+        # normalize numeric fields
+        def num_field(names):
+            val = extract_field(it, names)
+            try:
+                return float(val) if val is not None else None
+            except Exception:
+                return None
+
+        spot = num_field(["spot", "spot_price", "spotPrice", "price", "last"])
+        near = num_field(["near", "near_month", "front", "front_price"])
+        far = num_field(["far", "far_month", "back", "back_price"])
+        inventory = num_field(["inventory", "stocks", "stock"])
+        profit = num_field(["profit", "margin", "profit_per_ton"])
+        warehouse = num_field(["warehouse", "warehouse_receipts", "仓单", "warehouse_amount"])
+        reg = int(num_field(["reg", "register", "registered"]) or 0)
+        cancel = int(num_field(["cancel", "canceled", "withdrawn"]) or 0)
+        name = extract_field(it, ["name", "fullName", "contractName", "commodity"])
+
+        # Only include if we have at least spot, near, far OR profit+inventory fields — be tolerant
+        # Fill missing numeric fields with reasonable defaults (0 or NaN) to avoid crashes elsewhere
+        item = {
+            "name": name or code,
+            "spot": spot if spot is not None else 0.0,
+            "near": near if near is not None else 0.0,
+            "far": far if far is not None else 0.0,
+            "inventory": int(inventory or 0),
+            "profit": float(profit or 0.0),
+            "warehouse": int(warehouse or 0),
+            "reg": int(reg or 0),
+            "cancel": int(cancel or 0),
+        }
+        result[str(code)] = item
+    return result
+
+# ---------- 数据获取与客户端缓存（基于 st.session_state） ----------
+def get_data_from_api(url, token=None, timeout=6):
+    if requests is None:
+        raise RuntimeError("requests 库不可用，请在环境中安装 requests: pip install requests")
+    headers = {}
+    if token:
+        headers["Authorization"] = token if token.startswith(("Bearer ", "Basic ")) else f"Bearer {token}"
+    resp = requests.get(url, headers=headers, timeout=timeout)
+    resp.raise_for_status()
+    return resp.json()
+
+def load_data(api_url_value: str, token_value: str, ttl: int, fallback_to_mock: bool, force_refresh: bool):
+    """
+    返回标准字典格式的数据（key: code -> fields dict）。
+    使用 st.session_state 做简单客户端缓存，按 api_url 区分缓存条目。
+    """
+    cache_key = f"api_cache::{api_url_value or 'builtin'}"
+    now_ts = int(time.time())
+
+    # init cache store
+    if "api_cache_store" not in st.session_state:
+        st.session_state["api_cache_store"] = {}
+
+    store = st.session_state["api_cache_store"]
+
+    # serve cached if not expired and not forced refresh
+    if (not force_refresh) and cache_key in store:
+        entry = store[cache_key]
+        if ttl <= 0 or (now_ts - entry["ts"] < ttl):
+            return entry["data"], entry.get("meta", {})
+
+    # if no api_url provided -> use builtin
+    if not api_url_value:
+        data = builtin_mock()
+        store[cache_key] = {"ts": now_ts, "data": data, "meta": {"source": "mock"}}
+        return data, {"source": "mock"}
+
+    # try fetch from API
+    try:
+        json_body = get_data_from_api(api_url_value, token_value)
+        norm = normalize_api_json(json_body)
+        if not norm:
+            raise ValueError("无法解析 API 返回的 JSON 结构")
+        store[cache_key] = {"ts": now_ts, "data": norm, "meta": {"source": "api", "raw_sample": None}}
+        return norm, {"source": "api"}
+    except Exception as e:
+        # on failure, optionally fallback to mock
+        if fallback_to_mock:
+            data = builtin_mock()
+            store[cache_key] = {"ts": now_ts, "data": data, "meta": {"source": "mock_on_error", "error": str(e)}}
+            return data, {"source": "mock_on_error", "error": str(e)}
+        else:
+            # re-raise to allow app to show the error
+            raise
+
+# ---------- 载入数据 ----------
+try:
+    data, meta = load_data(api_url_value=api_url, token_value=auth_token,
+                           ttl=cache_ttl, fallback_to_mock=allow_fallback, force_refresh=refresh)
+    if meta.get("source", "").startswith("mock"):
+        st.info(f"使用内置 mock 数据（来源：{meta.get('source')}）")
+    else:
+        st.success("已从 API 获取数据")
+except Exception as e:
+    st.error(f"从 API 获取数据失败: {e}")
+    if allow_fallback:
+        data = builtin_mock()
+        st.info("已回退到内置 mock 数据")
+    else:
+        st.stop()
+
+# ---------- 将 dict 转为 DataFrame ----------
+df_raw = pd.DataFrame(data).T.reset_index().rename(columns={"index": "code"})
+# ensure numeric columns exist
+for col in ["spot", "near", "far", "inventory", "profit", "warehouse", "reg", "cancel"]:
+    if col not in df_raw.columns:
+        df_raw[col] = 0
+df_raw["spread"] = df_raw["near"].astype(float) - df_raw["far"].astype(float)
+df_raw["structure"] = df_raw["spread"].apply(lambda x: "Back" if x > 0 else "Contango")
+
+# ---------- 1. Back结构排行（精简表格） ----------
+st.subheader("🔥 热门品种榜")
+df_top = df_raw.sort_values("spread", ascending=False)
+show_cols = ["code", "name", "near", "far", "spread", "structure"]
+df_show = df_top[show_cols].copy()
+df_show.columns = ["代码", "品种", "近月", "远月", "价差", "结构"]
+st.dataframe(df_show, use_container_width=True, hide_index=True, height=250)
+
+best = df_top.iloc[0]
+st.metric("🏆 当前最热", f"{best['name']} ({best['code']})",
+          delta=f"价差 {best['spread']} 元", delta_color="normal")
+
+st.divider()
+
+# ---------- 2. 基差分析 ----------
+st.subheader("💹 基差分析")
+symbol_basis = st.selectbox("选择品种", df_raw["code"].tolist(), key="basis",
+                            format_func=lambda x: f"{x} - {data[x]['name']}")
+row = df_raw[df_raw["code"] == symbol_basis].iloc[0]
+basis_val = float(row.get("spot", 0.0)) - float(row.get("near", 0.0))
+basis_rate = (basis_val / float(row.get("spot", 0.0))) * 100 if float(row.get("spot", 0.0)) != 0 else np.nan
+# spot - future > 0 => 现货高于期货 => 升水
+basis_label = "升水" if basis_val > 0 else "贴水"
+
+c1, c2 = st.columns(2)
+c1.metric("现货", f"{row.get('spot', 0):,}")
+c2.metric("期货主力", f"{row.get('near', 0):,}")
+c3, c4 = st.columns(2)
+c3.metric("基差", f"{basis_val:.1f}", delta=basis_label)
+c4.metric("基差率", f"{basis_rate:.2f}%" if not np.isnan(basis_rate) else "N/A")
+
+st.divider()
+
+# ---------- 3. 利润与库存 ----------
+st.subheader("⚙️ 利润 & 库存")
+symbol_profit = st.selectbox("选择品种", df_raw["code"].tolist(), key="profit",
+                             format_func=lambda x: f"{x} - {data[x]['name']}")
+row_p = df_raw[df_raw["code"] == symbol_profit].iloc[0]
+cost = float(row_p.get("spot", 0.0)) * 0.7
+profit_rate_calc = (float(row_p.get("profit", 0.0)) / cost) * 100 if cost != 0 else np.nan
+
+col1, col2 = st.columns(2)
+col1.metric("📦 库存(万吨)", f"{int(row_p.get('inventory', 0)):,}")
+col2.metric("💰 利润(元/吨)", f"{float(row_p.get('profit', 0)):,}",
+            delta=f"利润率 {profit_rate_calc:.1f}%" if not np.isnan(profit_rate_calc) else "N/A")
+
+st.bar_chart(pd.DataFrame({
+    "指标": ["库存(百万吨)", "利润(十元)"],
+    "数值": [float(row_p.get('inventory', 0)) / 10, float(row_p.get('profit', 0)) / 10]
+}).set_index("指标"), height=150)
+
+st.divider()
+
+# ---------- 4. 仓单注册/注销 ----------
+st.subheader("🏢 仓单动态")
+symbol_wh = st.selectbox("选择品种", df_raw["code"].tolist(), key="wh",
+                         format_func=lambda x: f"{x} - {data[x]['name']}")
+row_w = df_raw[df_raw["code"] == symbol_wh].iloc[0]
+net_change = int(row_w.get("reg", 0)) - int(row_w.get("cancel", 0))
+
+cols = st.columns(2)
+cols[0].metric("📋 总仓单", f"{int(row_w.get('warehouse', 0)):,}")
+cols[1].metric("📤 新注册", f"+{int(row_w.get('reg', 0)):,}")
+cols2 = st.columns(2)
+cols2[0].metric("📥 新注销", f"-{int(row_w.get('cancel', 0)):,}")
+cols2[1].metric("🔄 净变化", f"{net_change:+d}",
+                delta="偏空" if net_change > 0 else "偏多",
+                delta_color="inverse" if net_change > 0 else "normal")
+
+st.divider()
+
+# ---------- 智能点评 ----------
+st.subheader("🧠 综合点评")
+top_code = df_top.iloc[0]["code"]
+top_row = df_raw[df_raw["code"] == top_code].iloc[0]
+wh_status = "仓单净增加，供应压力偏大" if (int(top_row.get("reg", 0)) - int(top_row.get("cancel", 0))) > 0 else "仓单净减少，现货偏紧"
+top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) if float(top_row.get('spot', 0.0)) != 0 else 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot'若为0，则为0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0top_basis_rate = ((float(top_row.get('spot', 0.0)) - float(top_row.get('near', 0.0))) / float(top_row.get('spot', 1.0)) * 100) 如果 float(top_row.get('spot', 0.0)) 不等于 0，则为 0.0
+st.success(f"✅ 当前Back最强：{top_row['name']}，基差率 {top_basis_rate:.2f}%，{wh_status}。")
+
+st.caption("💡 数据为模拟示例，替换为实时数据或填写 API URL 即可上线")
