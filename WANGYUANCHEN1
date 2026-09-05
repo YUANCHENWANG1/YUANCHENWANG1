@@ -1,0 +1,166 @@
+# -*- coding: utf-8 -*-# -*- 编码: utf-8 -*-
+# 手机专用版 - 针对竖屏小屏优化，加大触控区域，精简布局
+
+import streamlit as st
+import pandas as pd
+import numpy as np
+from datetime import datetime
+
+# ---------- 强制移动端适配的CSS ----------
+# 注意：Streamlit 的许多类名（例如 .css-xxxxx）是自动生成的，可能随版本变化而失效。
+# 建议尽量使用更通用的选择器或查找 data-testid（若可用），以提高兼容性。
+st.markdown("""
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    /* 整体宽度自适应，最大宽度600px，居中 */
+    .reportview-container .main .block-container {
+        max-width: 600px;最大宽度：600px；
+        padding-top: 1rem;上内边距：1rem；
+        padding-left: 0.8rem;左内边距：0.8rem；
+        padding-right: 0.8rem;右内边距：0.8rem；
+        margin: 0 auto;外边距：0 自动；
+    }
+    /* 指标卡片字体加大（注意：下面的类名可能随 streamlit 版本变化） */
+    .css-1y4p8pa {  /* metric label (可能易碎) */
+        font-size: 1rem !important;
+    }
+    .css-1xarl3l {  /* metric value (可能易碎) */
+        font-size: 1.6rem !important;
+    }
+    /* 下拉框、按钮加大触控区域 */
+    .stSelectbox, .stButton button {
+        font-size: 1.2rem !important;
+        padding: 0.5rem !important;
+    }
+    /* 表格字体自适应 */
+    .dataframe {
+        font-size: 0.9rem !important;
+    }
+    /* 标题优化 */
+    h1 {
+        font-size: 2rem !important;
+    }
+    h3 {
+        font-size: 1.3rem !important;
+    }
+    /* 滚动条美化 */
+    ::-webkit-scrollbar {
+        width: 3px;
+    }
+    /* 分割线更细 */
+    hr {
+        margin: 0.5rem 0;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ---------- 页面配置 ----------
+st.set_page_config(page_title="期货智析·手机版", layout="centered")
+st.title("📊 期货智析")
+st.caption(f"📱 手机专属 | {datetime.now().strftime('%m-%d %H:%M')}")
+
+# ---------- 模拟数据 ----------
+@st.cache_data
+def load_mock_data():
+    return {
+        "RB": {"name": "螺纹钢", "spot": 3750, "near": 3720, "far": 3650,
+               "inventory": 580, "profit": 185, "warehouse": 85600, "reg": 1200, "cancel": 450},
+        "I":  {"name": "铁矿石", "spot": 860, "near": 850, "far": 810,
+               "inventory": 13500, "profit": 92, "warehouse": 2300, "reg": 0, "cancel": 200},
+        "SA": {"name": "纯碱", "spot": 2250, "near": 2200, "far": 2100,
+               "inventory": 320, "profit": 260, "warehouse": 1500, "reg": 500, "cancel": 100},
+        "CU": {"name": "铜", "spot": 69000, "near": 68800, "far": 68500,
+               "inventory": 280, "profit": 800, "warehouse": 42000, "reg": 800, "cancel": 300},
+        "AU": {"name": "黄金", "spot": 478, "near": 476, "far": 475,
+               "inventory": 10, "profit": 15, "warehouse": 3500, "reg": 50, "cancel": 80},
+    }
+
+data = load_mock_data()
+df_raw = pd.DataFrame(data).T.reset_index().rename(columns={"index": "code"})
+df_raw["spread"] = df_raw["near"] - df_raw["far"]
+df_raw["structure"] = df_raw["spread"].apply(lambda x: "Back" if x > 0 else "Contango")
+
+# ---------- 1. Back结构排行（精简表格） ----------
+st.subheader("🔥 热门品种榜")
+df_top = df_raw.sort_values("spread", ascending=False)
+show_cols = ["code", "name", "near", "far", "spread", "structure"]
+df_show = df_top[show_cols].copy()
+df_show.columns = ["代码", "品种", "近月", "远月", "价差", "结构"]
+st.dataframe(df_show, use_container_width=True, hide_index=True, height=250)
+
+best = df_top.iloc[0]
+st.metric("🏆 当前最热", f"{best['name']} ({best['code']})",
+          delta=f"价差 {best['spread']} 元", delta_color="normal")
+
+st.divider()
+
+# ---------- 2. 基差分析 ----------
+st.subheader("💹 基差分析")st.subheader("基差分析")
+symbol_basis = st.selectbox("选择品种", df_raw["code"].tolist(), key="basis",
+                            format_func=lambda x: f"{x} - {data[x]['name']}")
+row = df_raw[df_raw["code"] == symbol_basis].iloc[0]
+basis_val = row["spot"] - row["near"]
+# 防止 spot 为 0 导致除零
+basis_rate = (basis_val / row["spot"]) * 100 if row["spot"] != 0 else np.nan
+
+# 基差方向中文说明：spot - future > 0 表示现货高于期货 -> 升水；否则为贴水
+basis_direction = "升水" if basis_val > 0 else ("无基差" if basis_val == 0 else "贴水")
+
+c1, c2 = st.columns(2)
+c1.metric("现货", f"{row['spot']:,}")
+c2.metric("期货主力", f"{row['near']:,}")
+c3, c4 = st.columns(2)
+# 将 delta 用带符号数值呈现，方向说明放在旁注
+c3.metric("基差", f"{basis_val:.1f}", delta=f"{basis_val:+.1f} 元")
+c4.metric("基差率", f"{basis_rate:.2f}%" if not np.isnan(basis_rate) else "N/A")
+st.caption(f"方向：{basis_direction}")
+
+st.divider()
+
+# ---------- 3. 利润与库存 ----------
+st.subheader("⚙️ 利润 & 库存")
+symbol_profit = st.selectbox("选择品种", df_raw["code"].tolist(), key="profit",
+                             format_func=lambda x: f"{x} - {data[x]['name']}")
+row_p = df_raw[df_raw["code"] == symbol_profit].iloc[0]
+cost = row_p["spot"] * 0.7
+profit_rate_calc = (row_p["profit"] / cost) * 100 if cost != 0 else np.nanprofit_rate_calc = (row_p["profit"] / cost) * 100 如果 cost 不等于 0，否则为 np.nanprofit_rate_calc = (row_p["profit"] / cost) * 100 如果 cost 不等于 0，否则为 np.nan
+
+col1, col2 = st.columns(2)
+col1.metric("📦 库存(吨)", f"{int(row_p['inventory']):,}")
+col2.metric("💰 利润(元/吨)", f"{row_p['profit']:,}", delta=f"利润率 {profit_rate_calc:.1f}%" if not np.isnan(profit_rate_calc) else "N/A")
+
+# 简单柱状图（手机端也显示）
+# 注意单位说明与上方一致（这里把库存用吨显示并缩放用于图表）
+bar_df = pd.DataFrame({
+    "指标": ["库存(千吨)", "利润(十元)"],
+    "数值": [row_p['inventory'] / 1000, row_p['profit'] / 10]
+}).set_index("指标")
+st.bar_chart(bar_df, height=150)
+
+st.divider()
+
+# ---------- 4. 仓单注册/注销 ----------
+st.subheader("🏢 仓单动态")
+symbol_wh = st.selectbox("选择品种", df_raw["code"].tolist(), key="wh",
+                         format_func=lambda x: f"{x} - {data[x]['name']}")
+row_w = df_raw[df_raw["code"] == symbol_wh].iloc[0]
+net_change = int(row_w["reg"]) - int(row_w["cancel"])
+
+cols = st.columns(2)
+cols[0].metric("📋 总仓单", f"{int(row_w['warehouse']):,}")
+cols[1].metric("📤 新注册", f"+{int(row_w['reg']):,}")
+cols2 = st.columns(2)
+cols2[0].metric("📥 新注销", f"-{int(row_w['cancel']):,}")
+cols2[1].metric("🔄 净变化", f"{net_change:+d}",
+                delta="偏空" if net_change > 0 else ("持平" if net_change == 0 else "偏多"),delta="偏空" 如果 net_change > 0 否则 ("持平" 如果 net_change == 0 否则 "偏多"),delta="偏空" 如果 net_change > 0 否则 ("持平" 如果 net_change == 0 否则 "偏多"),delta="偏空" 如果 net_change > 0 否则 ("持平" 如果 net_change == 0 否则 "偏多"),delta="偏空" 如果 net_change > 0 否则 ("持平" 如果 net_change == 0 否则 "偏多"),delta="偏空" 如果 net_change > 0 否则 ("持平" 如果 net_change == 0 否则 "偏多"),delta="偏空" 如果 net_change > 0 否则 ("持平" 如果 net_change == 0 否则 "偏多"),delta="偏空" 如果 net_change > 0 否则 ("持平" 如果 net_change == 0 否则 "偏多"),delta=“偏空” 如果 net_change > 0 否则 (“持平” 如果 net_change == 0 否则 “偏多”),delta=“偏空” 如果 net_change > 0 否则 (“持平” 如果 net_change == 0 否则 “偏多”),delta=“偏空” 如果 net_change > 0 否则 (“持平” 如果 net_change == 0 否则 “偏多”),delta=“偏空” 如果 net_change > 0 否则 (“持平” 如果 net_change == 0 否则 “偏多”),
+                delta_color="inverse" if net_change > 0 else "normal")
+
+st.divider()
+
+# ---------- 智能点评 ----------
+st.subheader("🧠 综合点评")
+top_code = df_top.iloc[0]["code"]
+top_row = df_raw[df_raw["code"] == top_code].iloc[0]
+wh_status = "仓单净增加，供应压力偏大" if (int(top_row["reg"]) - int(top_row["cancel"])) > 0 else "仓单净减少，现货偏紧"
+basis_rate_top = ((top_row['spot'] - top_row['near']) / top_row['spot'] * 100) if top_row['spot'] != 0 else 0.0
+st.success(f"✅ 当前Back最强：**{top_row['name']}**，基差率 {basis_rate_top:.2f}%，{wh_status}。")
